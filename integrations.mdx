@@ -1,0 +1,169 @@
+---
+title: "Integrations"
+description: "Third-party tools, APIs, and connecting your tech stack to Shopify."
+icon: "plug"
+---
+
+## Klaviyo
+
+### Initial Setup
+
+<Steps>
+  <Step title="Create Your Klaviyo Account">
+    Sign up at [klaviyo.com](https://klaviyo.com) and create a new account for your brand.
+  </Step>
+  <Step title="Connect to Shopify">
+    In Klaviyo, go to **Integrations → Shopify**, click **Install**, and authorize the app.
+  </Step>
+  <Step title="Verify Sync">
+    Klaviyo will begin syncing customers, products, and orders automatically.
+  </Step>
+</Steps>
+
+### What Syncs Automatically
+
+- Customers → Klaviyo Profiles
+- Orders → Events (`Placed Order`, `Ordered Product`, `Fulfilled Order`)
+- Products → Klaviyo Product Catalog
+
+### Core Flows to Set Up
+
+| Flow | Trigger | Priority |
+|------|---------|----------|
+| Welcome Series | List subscription | High |
+| Abandoned Checkout | `Started Checkout` (not completed in 1h) | High |
+| Browse Abandonment | `Viewed Product` (not purchased in 4h) | Medium |
+| Post-Purchase | `Placed Order` | High |
+| Winback | `Placed Order` > 90 days ago | Medium |
+
+<Tip>
+  Need help setting up flows? Submit a ticket and we can configure your core Klaviyo flows as an add-on.
+</Tip>
+
+---
+
+## Google Analytics 4 (GA4)
+
+### Setup via Google Tag Manager
+
+<Steps>
+  <Step title="Create a GTM Container and GA4 Property">
+    Set up both in Google Tag Manager and Google Analytics.
+  </Step>
+  <Step title="Create a GA4 Configuration Tag">
+    In GTM, add a **Google Analytics: GA4 Configuration** tag with your Measurement ID (`G-XXXXXXXXXX`). Set trigger to **All Pages**.
+  </Step>
+  <Step title="Add GTM Snippet to Your Theme">
+    Add to `<head>` in `theme.liquid`:
+    ```html
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-XXXXXXX');</script>
+    ```
+  </Step>
+</Steps>
+
+### Key Events to Track
+
+| Event | Trigger |
+|-------|---------|
+| `purchase` | Order confirmation page |
+| `add_to_cart` | Cart events |
+| `view_item` | Product pages |
+| `begin_checkout` | Checkout start |
+
+---
+
+## Meta Pixel (Facebook / Instagram Ads)
+
+### Install via Shopify
+
+1. Go to **Shopify Admin → Apps → Meta**
+2. Connect your Facebook Business account
+3. Select your Meta Pixel and enable **automatic event tracking**
+
+### Standard Events
+
+If installing manually, add these events to the relevant theme templates:
+- `ViewContent` — product pages
+- `AddToCart` — add to cart action
+- `InitiateCheckout` — checkout start
+- `Purchase` — order confirmation page
+
+---
+
+## Recharge (Subscriptions)
+
+### How Creative Labs Integrates Recharge
+
+1. Install the Recharge Shopify app
+2. Add Recharge's product widget to product page templates
+3. Style the subscribe/purchase toggle to match your brand
+4. Test subscription creation, skip, pause, and cancel flows
+
+### Customer Portal
+
+Recharge provides a hosted customer portal at `yourdomain.com/tools/recurring/customer_portal`.
+
+### Common Recharge Issues
+
+| Issue | Fix |
+|-------|-----|
+| Subscribe option not showing | Check Recharge product settings — subscription must be enabled per product |
+| Checkout not showing discount | Verify Recharge is installed correctly; may need a new cart link |
+| Customer can't manage subscription | Direct to `/tools/recurring/customer_portal` |
+
+---
+
+## Gorgias (Customer Support)
+
+### Connecting Shopify to Gorgias
+
+1. In Gorgias, go to **Settings → Integrations → Shopify**
+2. Click **Connect** and enter your Shopify domain
+3. Authorize the app
+
+### What This Enables
+
+- View full order history in any Gorgias ticket
+- Issue refunds directly from Gorgias
+- Cancel orders from Gorgias
+- See customer lifetime value in ticket sidebars
+
+---
+
+## Webhooks
+
+### Setting Up a Webhook
+
+1. Go to **Shopify Admin → Settings → Notifications → Webhooks**
+2. Click **Create webhook**
+3. Choose an event (e.g., `orders/create`)
+4. Enter the endpoint URL
+5. Select format (JSON recommended)
+6. Click **Save**
+
+### Common Webhook Use Cases
+
+| Event | Use Case |
+|-------|---------|
+| `orders/create` | Trigger fulfillment, send to ERP |
+| `products/update` | Sync to search index or PIM |
+| `customers/create` | Add to CRM, trigger welcome flow |
+| `inventory_levels/update` | Alert team on low stock |
+
+<Note>
+  Need a webhook configured? Submit a support ticket and we'll set it up and test it for you.
+</Note>
+
+<Card
+  title="Open a Support Ticket"
+  icon="headset"
+  href="https://support.thecreativelabs.io"
+  horizontal
+>
+  We can configure and test any integration for you.
+</Card>

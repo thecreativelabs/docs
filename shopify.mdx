@@ -1,0 +1,153 @@
+---
+title: "Shopify Guides"
+description: "Theme development, app integrations, and Shopify Plus workflows for Creative Labs clients."
+icon: "bag-shopping"
+---
+
+## Theme Development
+
+### How We Build Your Theme
+
+Creative Labs builds themes using:
+- **Shopify's Dawn** base theme (or a custom base for Plus clients)
+- **Liquid** for server-side templating
+- **Vanilla JS / Alpine.js** for interactions
+- **Tailwind CSS** (on select projects) or scoped CSS modules
+
+We do **not** use page builders (Pagefly, GemPages, etc.) for custom builds — all code is version-controlled and maintainable.
+
+---
+
+### Theme Deployment Checklist
+
+Before any theme goes live, we run through this checklist:
+
+<AccordionGroup>
+  <Accordion title="Performance">
+    - [ ] Lighthouse score ≥ 85 on mobile
+    - [ ] LCP < 2.5s on product pages
+    - [ ] All images served in WebP format with proper alt tags
+    - [ ] Lazy loading enabled for below-fold images
+  </Accordion>
+  <Accordion title="Functionality">
+    - [ ] Cart — add, update, remove items
+    - [ ] Checkout — all payment methods tested
+    - [ ] Search — predictive search working
+    - [ ] Filters — collection filters functional
+    - [ ] Mobile — fully tested on iOS Safari and Android Chrome
+  </Accordion>
+  <Accordion title="SEO & Analytics">
+    - [ ] `<title>` and meta description on all page types
+    - [ ] Google Analytics / GTM tag firing correctly
+    - [ ] Canonical tags set
+    - [ ] Structured data for products
+  </Accordion>
+  <Accordion title="Accessibility">
+    - [ ] All interactive elements keyboard accessible
+    - [ ] Color contrast passes WCAG AA
+    - [ ] Skip to content link present
+  </Accordion>
+</AccordionGroup>
+
+---
+
+### Requesting Theme Changes After Launch
+
+**Retainer clients:**
+1. Submit a request in your Slack channel with a description and screenshot/video
+2. We'll scope the change and confirm hours within 1 business day
+3. Changes are built in a development branch, reviewed, then pushed to the live theme
+
+**Non-retainer clients:**
+- Open a support ticket at [support.thecreativelabs.io](https://support.thecreativelabs.io)
+- Changes are billed at our standard hourly rate
+
+---
+
+## Shopify Plus
+
+### What's Different on Plus?
+
+| Feature | Description |
+|---------|-------------|
+| **Checkout Extensibility** | Custom checkout UI blocks via Checkout Extensions |
+| **Launchpad** | Scheduled theme and product changes |
+| **Flow** | Automated workflows (tagging, fulfillment, notifications) |
+| **B2B** | Wholesale portals with custom pricing |
+| **Multistore / Markets** | Multiple storefronts from one admin |
+
+### Checkout Extensibility (Plus Only)
+
+For Shopify Plus clients, we build checkout customizations using the official Checkout Extensions API (replacing legacy `checkout.liquid`).
+
+**Common customizations we build:**
+- Upsell / cross-sell blocks
+- Custom shipping messaging
+- Trust badges and guarantee blocks
+- Address validation warnings
+- Gift message fields
+
+<Warning>
+  Checkout Extensions require Shopify Plus and cannot be tested on development stores without Plus access.
+</Warning>
+
+---
+
+## App Integrations
+
+### Recommended App Stack
+
+We've vetted and integrated these apps across dozens of stores:
+
+<Columns cols={2}>
+  <Card title="Reviews" icon="star">
+    Judge.me (default), Okendo (Plus), Yotpo
+  </Card>
+  <Card title="Email / SMS" icon="envelope">
+    Klaviyo (preferred), Omnisend, Postscript
+  </Card>
+  <Card title="Loyalty" icon="heart">
+    Smile.io, LoyaltyLion
+  </Card>
+  <Card title="Upsell" icon="arrow-up">
+    ReConvert, Frequently Bought Together
+  </Card>
+  <Card title="Subscriptions" icon="rotate">
+    Recharge, Skio
+  </Card>
+  <Card title="Search" icon="magnifying-glass">
+    Searchanise, Boost Commerce
+  </Card>
+</Columns>
+
+---
+
+## Store Management
+
+### Adding Products
+
+1. Go to **Products → Add product** in your Shopify Admin
+2. Fill in: title, description, images, price, variants
+3. Add to the correct **Collections**
+4. Set **SEO title and description** under "Search engine listing preview"
+5. Click **Save**
+
+### Metafields
+
+Metafields store extra data on products, variants, collections, and customers. Common uses:
+- Product specs / materials / dimensions
+- Custom labels ("New", "Bestseller")
+- Size guides per product
+- Warranty information
+
+<Tip>
+  We configure metafield definitions during development. To add values, go to the product or collection in admin and scroll to the **Metafields** section at the bottom.
+</Tip>
+
+### Managing Collections
+
+Collections can be **manual** (you choose products) or **automated** (products added by rules like tag, price, or vendor).
+
+<Note>
+  Automated collections are easier to maintain at scale. Set your product tags consistently and collections update themselves.
+</Note>

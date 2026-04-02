@@ -1,33 +1,225 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: "API Reference"
+description: "Endpoints, authentication, and request/response examples for Shopify and connected services."
+icon: "terminal"
 ---
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+## Shopify Storefront API
 
-## Welcome
+The Storefront API is a public GraphQL API for building custom storefronts and headless front-ends.
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
-
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
-
-## Authentication
-
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
-
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+**Base URL:**
 ```
+https://YOUR-STORE.myshopify.com/api/2024-10/graphql.json
+```
+
+**Authentication:**
+```http
+X-Shopify-Storefront-Access-Token: YOUR_TOKEN
+Content-Type: application/json
+```
+
+### Fetch a Product by Handle
+
+```graphql
+query GetProduct($handle: String!) {
+  product(handle: $handle) {
+    id
+    title
+    descriptionHtml
+    priceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+    }
+    images(first: 5) {
+      edges {
+        node {
+          url
+          altText
+        }
+      }
+    }
+    variants(first: 10) {
+      edges {
+        node {
+          id
+          title
+          availableForSale
+          price {
+            amount
+            currencyCode
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### Create a Cart
+
+```graphql
+mutation CreateCart($lines: [CartLineInput!]!) {
+  cartCreate(input: { lines: $lines }) {
+    cart {
+      id
+      checkoutUrl
+      lines(first: 10) {
+        edges {
+          node {
+            id
+            quantity
+            merchandise {
+              ... on ProductVariant {
+                id
+                title
+              }
+            }
+          }
+        }
+      }
+    }
+    userErrors {
+      field
+      message
+    }
+  }
+}
+```
+
+**Variables:**
+```json
+{
+  "lines": [
+    {
+      "merchandiseId": "gid://shopify/ProductVariant/VARIANT_ID",
+      "quantity": 1
+    }
+  ]
+}
+```
+
+---
+
+## Shopify Admin API
+
+The Admin API is a private REST and GraphQL API for backend operations.
+
+<Warning>
+  Never expose Admin API tokens in frontend code or client-side JavaScript.
+</Warning>
+
+**REST Base URL:**
+```
+https://YOUR-STORE.myshopify.com/admin/api/2024-10/
+```
+
+**Authentication:**
+```http
+X-Shopify-Access-Token: YOUR_ADMIN_TOKEN
+```
+
+### Common REST Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/orders.json` | GET | List orders |
+| `/orders/{id}.json` | GET | Get single order |
+| `/products.json` | GET | List products |
+| `/products/{id}.json` | PUT | Update a product |
+| `/customers.json` | GET | List customers |
+| `/inventory_levels.json` | POST | Adjust inventory |
+| `/webhooks.json` | POST | Register a webhook |
+
+---
+
+## Webhook Verification
+
+All Shopify webhooks include an HMAC signature. Always verify before processing:
+
+```javascript
+import crypto from "crypto";
+
+function verifyWebhook(rawBody, hmacHeader, secret) {
+  const digest = crypto
+    .createHmac("sha256", secret)
+    .update(rawBody, "utf8")
+    .digest("base64");
+  return digest === hmacHeader;
+}
+
+// In your webhook handler:
+const rawBody = await req.text();
+const hmac = req.headers.get("X-Shopify-Hmac-Sha256");
+const isValid = verifyWebhook(rawBody, hmac, process.env.SHOPIFY_WEBHOOK_SECRET);
+
+if (!isValid) {
+  return new Response("Unauthorized", { status: 401 });
+}
+```
+
+---
+
+## Klaviyo API
+
+### Track Custom Events
+
+```javascript
+fetch(`https://a.klaviyo.com/api/track`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    token: "YOUR_PUBLIC_KEY",
+    event: "Viewed Size Guide",
+    customer_properties: { $email: "customer@example.com" },
+    properties: { product_id: "123", product_name: "Classic T-Shirt" },
+  }),
+});
+```
+
+### Subscribe to a List
+
+```javascript
+await fetch(`https://a.klaviyo.com/api/v2/list/${LIST_ID}/subscribe`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "api-key": process.env.KLAVIYO_PRIVATE_KEY,
+  },
+  body: JSON.stringify({
+    profiles: [{ email: "customer@example.com" }],
+  }),
+});
+```
+
+---
+
+## Rate Limits
+
+| API | Limit |
+|-----|-------|
+| Shopify Storefront API | 1000 points/second |
+| Shopify Admin REST | 2 req/s (40 burst) |
+| Shopify Admin GraphQL | 1000 cost units/second |
+| Klaviyo Track/Identify | 100 req/second |
+
+---
+
+## HTTP Status Codes
+
+| Code | Meaning |
+|------|---------|
+| `200` | Success |
+| `400` | Bad request — malformed query or body |
+| `401` | Unauthorized — check your API token |
+| `403` | Forbidden — insufficient API scopes |
+| `404` | Resource not found |
+| `422` | Unprocessable entity |
+| `429` | Rate limit exceeded — back off and retry |
+| `500` | Shopify server error — retry with exponential backoff |
+
+<Note>
+  Always check both `errors` (GraphQL-level) and `userErrors` (mutation-level) in GraphQL responses.
+</Note>

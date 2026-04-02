@@ -1,0 +1,179 @@
+---
+title: "Troubleshooting"
+description: "Diagnose and resolve common issues with your Shopify storefront."
+icon: "wrench"
+---
+
+<Note>
+  For anything not covered here, [submit a support ticket](https://support.thecreativelabs.io) and include a screenshot, steps to reproduce, and your browser/device.
+</Note>
+
+---
+
+## Store Performance
+
+### Slow Page Load Times
+
+**Common causes and fixes:**
+
+| Cause | Fix |
+|-------|-----|
+| Large unoptimized images | Convert to WebP, compress to < 200KB per image |
+| Too many Shopify apps | Audit apps — unused apps still load scripts |
+| Render-blocking scripts | Move non-critical JS to `defer` or `async` |
+| Slow third-party scripts | Audit in Chrome DevTools → Network tab |
+
+**How to check:** Run your store URL through [PageSpeed Insights](https://pagespeed.web.dev) and review the **Opportunities** section.
+
+---
+
+## Checkout Issues
+
+### "This payment method is unavailable"
+
+**Check:**
+1. Your Shopify plan includes the payment method
+2. The gateway is enabled in **Settings → Payments**
+3. Your store currency matches the gateway's supported currencies
+4. Your billing address on file with the payment provider is current
+
+### Checkout Not Completing
+
+<Steps>
+  <Step title="Try an Incognito Window">
+    Rules out cookie and session issues.
+  </Step>
+  <Step title="Try a Different Browser">
+    Confirms whether it's browser-specific.
+  </Step>
+  <Step title="Check Shopify Status">
+    Visit [shopifystatus.com](https://shopifystatus.com) to rule out platform outages.
+  </Step>
+  <Step title="Check Recent App Installs">
+    If an app was installed recently, try disabling it.
+  </Step>
+</Steps>
+
+Submit a ticket with the exact error message, browser, device, and any order numbers that were partially created.
+
+### Discount Codes Not Working
+
+| Issue | Likely Cause |
+|-------|-------------|
+| "Code not found" | Typo in code, or not yet active |
+| "Not applicable" | Cart doesn't meet minimum requirements |
+| "Already been used" | Usage limit reached |
+| Wrong discount amount | Check % vs fixed amount setting |
+
+**Check in:** Shopify Admin → **Discounts** → Click the code → Review conditions
+
+---
+
+## Products & Collections
+
+### Product Not Showing in Collection
+
+**Automated collections:**
+- Check that the product's tags, type, or vendor match the collection conditions (case-sensitive)
+
+**Manual collections:**
+- Confirm the product is added to the collection in admin
+
+**All collections:**
+- Ensure the product status is **Active** (not Draft)
+- Check for active sales channel restrictions
+
+### Inventory Showing Incorrect Stock
+
+1. Go to **Products → [Product] → Variants → [Variant]**
+2. Confirm **Inventory tracked** is enabled
+3. Check **Inventory history** for unexpected adjustments
+4. If using a 3PL or inventory app, check the app's sync log
+
+### Images Not Displaying
+
+| Symptom | Fix |
+|---------|-----|
+| Broken image icon | Re-upload; Shopify may have failed to process it |
+| Image is blurry | Minimum recommended size: 2048×2048px |
+| Wrong image on variant | Check variant image assignments |
+| Shows in admin but not storefront | Clear browser cache |
+
+---
+
+## Theme Issues
+
+### Theme Changes Not Showing
+
+1. Hard refresh: `Ctrl+Shift+R` (Windows) or `Cmd+Shift+R` (Mac)
+2. Clear browser cache
+3. Confirm you're viewing the **published theme**, not a draft
+
+<Warning>
+  Do not edit live theme `.js` or `.liquid` files directly to fix bugs — this can introduce new issues. Submit a ticket instead.
+</Warning>
+
+### JavaScript Errors in Console
+
+1. Open Chrome DevTools (`F12`) → **Console** tab
+2. Note the exact error message and file name
+3. Screenshot and [submit a ticket](https://support.thecreativelabs.io)
+
+### Theme Editor Changes Not Saving
+
+- Check your internet connection
+- Try a different browser
+- Check if another staff member has the theme editor open simultaneously (Shopify only allows one editor session at a time)
+
+---
+
+## Apps
+
+### App Widget Not Loading
+
+1. Check the app is installed: **Apps → [App Name]**
+2. Check the app embed is enabled: **Online Store → Themes → Customize → App embeds**
+3. Check for JavaScript errors in the console related to the app
+4. Try re-toggling the app embed off and on
+
+### App Causing Layout Breaks
+
+1. Note when the issue started (correlate with app install/update date)
+2. Go to **Online Store → Themes → Customize → App embeds** and toggle the app off
+3. If disabling fixes it, [submit a ticket](https://support.thecreativelabs.io) with the app name
+
+<Warning>
+  Contact us before re-installing integrated apps — re-installs can overwrite theme code changes we've made.
+</Warning>
+
+---
+
+## Email & Notifications
+
+### Order Confirmations Not Sending
+
+1. Confirm **Settings → Notifications → Order confirmation** is enabled
+2. Check the customer's spam folder
+3. Verify the customer's email was entered correctly
+4. Check [shopifystatus.com](https://shopifystatus.com) for platform issues
+
+### Custom Email Domain Not Working
+
+1. Verify DNS records are correctly set with [MXToolbox](https://mxtoolbox.com)
+2. Re-verify the email in **Settings → Notifications → Sender email**
+3. Allow up to 48 hours for DNS propagation
+
+---
+
+## Getting More Help
+
+<CardGroup cols={2}>
+  <Card title="Submit a Support Ticket" icon="ticket" href="https://support.thecreativelabs.io">
+    Include screenshots, steps to reproduce, and browser/device info.
+  </Card>
+  <Card title="Email Us" icon="envelope" href="mailto:hello@thecreativelabs.io">
+    For billing or non-urgent questions.
+  </Card>
+</CardGroup>
+
+For urgent issues (store down, checkout broken), flag your ticket as **Critical** and message us in Slack.

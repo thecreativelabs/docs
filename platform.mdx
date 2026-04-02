@@ -1,0 +1,168 @@
+---
+title: "Platform Setup"
+description: "Environment configuration, DNS, deployments, and infrastructure setup for your Creative Labs project."
+icon: "server"
+---
+
+## Environments
+
+Every project includes at minimum two environments:
+
+| Environment | Purpose | URL Pattern |
+|-------------|---------|-------------|
+| **Development** | Active build work | `yourstore.myshopify.com` (dev theme) |
+| **Staging** | UAT and client review | Theme preview link |
+| **Production** | Live store | `yourstore.com` |
+
+<Note>
+  For Shopify, "staging" is a theme preview link, not a separate URL. There is no separate staging domain without Shopify Plus.
+</Note>
+
+---
+
+## DNS Configuration
+
+### Connecting Your Custom Domain to Shopify
+
+<Steps>
+  <Step title="Go to Shopify Domains Settings">
+    Shopify Admin → **Settings → Domains** → **Connect existing domain**
+  </Step>
+  <Step title="Enter Your Domain">
+    Type your domain (e.g., `yourstore.com`) and click **Next**
+  </Step>
+  <Step title="Update Your DNS Records">
+    In your domain registrar (GoDaddy, Cloudflare, Namecheap, etc.):
+    - Add an **A record**: `@` → `23.227.38.65`
+    - Add a **CNAME record**: `www` → `shops.myshopify.com`
+  </Step>
+  <Step title="Set as Primary Domain">
+    Once verified, set the domain as primary and enable **Redirect all traffic to this domain**
+  </Step>
+</Steps>
+
+DNS propagation typically takes **15 minutes to 48 hours**.
+
+### Common DNS Issues
+
+| Problem | Likely Cause | Fix |
+|---------|-------------|-----|
+| "Domain not verified" | DNS not propagated yet | Wait 30 min, check with [whatsmydns.net](https://whatsmydns.net) |
+| `www` not redirecting | Missing CNAME record | Add `www → shops.myshopify.com` |
+| SSL certificate error | DNS pointing to wrong IP | Verify A record is `23.227.38.65` |
+| Previous host still showing | Old DNS records cached | Wait for full propagation |
+
+---
+
+## Shopify Theme Deployment
+
+### Deploying via Shopify CLI
+
+We use Shopify CLI for all theme deployments. This is handled by the Creative Labs team.
+
+```bash
+# Push to a development theme
+shopify theme push --theme=THEME_ID
+
+# Push to live (requires confirmation)
+shopify theme push --live
+```
+
+### Theme Versioning
+
+All themes are version-controlled in Git. We maintain:
+- `main` — current production theme
+- `dev` — active development
+- Feature branches for individual features
+
+<Warning>
+  Never edit the live theme directly in the Shopify theme editor during active development — edits may be overwritten on the next push.
+</Warning>
+
+---
+
+## Environment Variables
+
+### Shopify Environment Settings
+
+For headless or custom integration projects, environment variables are managed in Vercel:
+
+| Variable | Description |
+|----------|-------------|
+| `SHOPIFY_STORE_DOMAIN` | Your `*.myshopify.com` domain |
+| `SHOPIFY_STOREFRONT_API_TOKEN` | Public Storefront API access token |
+| `SHOPIFY_ADMIN_API_KEY` | Admin API key (server-side only) |
+| `SHOPIFY_WEBHOOK_SECRET` | For verifying Shopify webhooks |
+
+### Getting Shopify API Tokens
+
+**Storefront API Token:**
+1. Shopify Admin → **Apps → Develop apps**
+2. Create a new private app
+3. Enable **Storefront API access**
+4. Copy the token
+
+**Admin API Token:**
+1. Shopify Admin → **Apps → Develop apps**
+2. Create a new private app
+3. Enable required **Admin API scopes**
+4. Copy the Admin API access token
+
+<Warning>
+  Never expose Admin API tokens in frontend code or client-side JavaScript.
+</Warning>
+
+---
+
+## Vercel Deployments (Headless Projects)
+
+### Deployment Flow
+
+```
+Git push to main
+  → Vercel build triggered
+    → Preview URL generated (for PRs)
+      → Production deployment on merge to main
+```
+
+### Checking Deployment Status
+
+1. Log into [vercel.com](https://vercel.com)
+2. Navigate to your project
+3. Click the latest deployment to view build logs
+
+### Rolling Back a Deployment
+
+If a production issue occurs:
+1. Go to your Vercel project → **Deployments**
+2. Find the last known-good deployment
+3. Click **...** → **Promote to Production**
+
+---
+
+## Backups
+
+<Warning>
+  Shopify does not offer built-in full backups. We strongly recommend setting one up.
+</Warning>
+
+**Recommended tools:**
+- **Rewind** — automated daily backups of products, orders, and theme code
+- **Matrixify (Excelify)** — manual exports for products, collections, customers
+
+Theme code is backed up in our Git repository for all Creative Labs clients.
+
+---
+
+## Email Configuration
+
+### Custom Email Domain
+
+For sending emails from `@yourdomain.com`:
+1. Go to **Settings → Notifications → Sender email**
+2. Click **Verify email**
+3. Add the DNS records provided to your domain registrar
+
+### Transactional Email Templates
+
+Customize order confirmations, shipping updates, and other notifications under **Settings → Notifications**. Update the **sender name** and **reply-to email** under **Settings → General → Store details**.
